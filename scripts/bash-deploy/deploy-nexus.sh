@@ -148,7 +148,15 @@ if [ $proceed = "y" ]; then
     {   
         printf "Proceeding with deployment \n"
         mkdir -p ./logs/$CHAIN_NAME
-        forge script DeployNexus false --sig "run(bool)" --rpc-url $CHAIN_RPC_URL --etherscan-api-key $CHAIN_NAME --private-key $PRIVATE_KEY $VERIFY -vv --broadcast --slow $GAS_SUFFIX 1> ./logs/$CHAIN_NAME/$CHAIN_NAME-deploy-nexus.log 2> ./logs/$CHAIN_NAME/$CHAIN_NAME-deploy-nexus-errors.log 
+        
+        # Set verification flag (default to false)
+        SHOULD_VERIFY=false
+        
+        if [ "$SHOULD_VERIFY" = true ]; then
+            forge script DeployNexus false --sig "run(bool)" --rpc-url $CHAIN_RPC_URL --etherscan-api-key $CHAIN_NAME --private-key $PRIVATE_KEY $VERIFY -vv --broadcast --slow $GAS_SUFFIX 1> ./logs/$CHAIN_NAME/$CHAIN_NAME-deploy-nexus.log 2> ./logs/$CHAIN_NAME/$CHAIN_NAME-deploy-nexus-errors.log
+        else
+            forge script DeployNexus false --sig "run(bool)" --rpc-url $CHAIN_RPC_URL --private-key $PRIVATE_KEY -vv --broadcast --slow $GAS_SUFFIX 1> ./logs/$CHAIN_NAME/$CHAIN_NAME-deploy-nexus.log 2> ./logs/$CHAIN_NAME/$CHAIN_NAME-deploy-nexus-errors.log
+        fi
     } || {
         printf "Deployment failed\n See logs for more details\n"
         exit 1
