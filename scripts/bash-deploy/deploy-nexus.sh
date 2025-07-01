@@ -5,7 +5,7 @@
 ### VERIFY INPUTS ###
 printMan() {
     printf "Usage: $0 <Environment: local|mainnet|testnet> <Network Name>\n"
-    printf "Supported networks: avalanche, ethereum, polygon, arbitrum, base\n"
+    printf "Supported networks: avalanche, plume, ethereum, polygon, arbitrum, base\n"
 }
 
 if [ $# -eq 0 ]; then
@@ -53,6 +53,9 @@ setup_chain_config() {
         "avalanche")
             CHAIN_RPC_URL=$(op read op://5ylebqljbh3x6zomdxi3qd7tsa/AVALANCHE_RPC_URL/credential)
             ;;
+        "plume")
+            CHAIN_RPC_URL=$(op read op://5ylebqljbh3x6zomdxi3qd7tsa/PLUME_RPC_URL/credential)
+            ;;
         "ethereum")
             CHAIN_RPC_URL=$(op read op://5ylebqljbh3x6zomdxi3qd7tsa/ETHEREUM_RPC_URL/credential)
             ;;
@@ -67,7 +70,7 @@ setup_chain_config() {
             ;;
         *)
             printf "Unsupported chain: $CHAIN_NAME\n"
-            printf "Supported chains: avalanche, ethereum, polygon, arbitrum, base\n"
+            printf "Supported chains: avalanche, plume, ethereum, polygon, arbitrum, base\n"
             exit 1
             ;;
     esac
