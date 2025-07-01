@@ -3,6 +3,7 @@
 ### VERIFY INPUTS ###
 printMan() {
     printf "Usage: $0 <Environment: local|mainnet|testnet> <Network Name>\n"
+    printf "Supported networks: avalanche, ethereum, polygon, arbitrum, base\n"
 }
 
 if [ $# -eq 0 ]; then
@@ -38,21 +39,43 @@ else
     fi
 fi
 
+# Load environment variables from .env (for EP_V07_DEPLOY_TX_DATA and other variables)
 source ../../.env
 
-# set private key based on the environment
-if [ $ENVIRONMENT = "mainnet" ]; then
-    PRIVATE_KEY=$MAINNET_DEPLOYER_PRIVATE_KEY
-else 
-    if [ $ENVIRONMENT = "testnet" ]; then
-        PRIVATE_KEY=$TESTNET_DEPLOYER_PRIVATE_KEY
-    else 
-        PRIVATE_KEY=$LOCAL_DEPLOYER_PRIVATE_KEY
-    fi
-fi
+# Load private key from OnePassword for all environments
+PRIVATE_KEY=$(op read op://uppkq2linnagjo7zxcclzjvrvm/V2_Deployer/credential)
+
+# Define chain configurations - Load RPC URLs directly from OnePassword
+setup_chain_config() {
+    case $CHAIN_NAME in
+        "avalanche")
+            CHAIN_RPC_URL=$(op read op://5ylebqljbh3x6zomdxi3qd7tsa/AVALANCHE_RPC_URL/credential)
+            ;;
+        "ethereum")
+            CHAIN_RPC_URL=$(op read op://5ylebqljbh3x6zomdxi3qd7tsa/ETHEREUM_RPC_URL/credential)
+            ;;
+        "polygon")
+            CHAIN_RPC_URL=$(op read op://5ylebqljbh3x6zomdxi3qd7tsa/POLYGON_RPC_URL/credential)
+            ;;
+        "arbitrum")
+            CHAIN_RPC_URL=$(op read op://5ylebqljbh3x6zomdxi3qd7tsa/ARBITRUM_RPC_URL/credential)
+            ;;
+        "base")
+            CHAIN_RPC_URL=$(op read op://5ylebqljbh3x6zomdxi3qd7tsa/BASE_RPC_URL/credential)
+            ;;
+        *)
+            printf "Unsupported chain: $CHAIN_NAME\n"
+            printf "Supported chains: avalanche, ethereum, polygon, arbitrum, base\n"
+            exit 1
+            ;;
+    esac
+}
+
+# Set up chain configuration
+setup_chain_config
 
 ### DEPLOY PRE-REQUISITES ###
-{ (bash deploy-prerequisites.sh $PRIVATE_KEY $ENVIRONMENT $CHAIN_NAME) } || {
+{ (bash deploy-prerequisites.sh $PRIVATE_KEY $ENVIRONMENT $CHAIN_NAME $CHAIN_RPC_URL) } || {
     printf "Deployment prerequisites failed\n"
     exit 1
 }
@@ -94,7 +117,7 @@ fi
 
 ### DEPLOY NEXUS SCs ###
 printf "Addresses for Nexus SCs:\n"
-forge script DeployNexus true --sig "run(bool)" --rpc-url $CHAIN_NAME -vv | grep -e "Addr" -e "already deployed"
+forge script DeployNexus true --sig "run(bool)" --rpc-url $CHAIN_RPC_URL -vv | grep -e "Addr" -e "already deployed"
 printf "Do you want to proceed with the addresses above? (y/n): "
 read -r proceed
 if [ $proceed = "y" ]; then
@@ -114,7 +137,7 @@ if [ $proceed = "y" ]; then
     {   
         printf "Proceeding with deployment \n"
         mkdir -p ./logs/$CHAIN_NAME
-        forge script DeployNexus false --sig "run(bool)" --rpc-url $CHAIN_NAME --etherscan-api-key $CHAIN_NAME --private-key $PRIVATE_KEY $VERIFY -vv --broadcast --slow $GAS_SUFFIX 1> ./logs/$CHAIN_NAME/$CHAIN_NAME-deploy-nexus.log 2> ./logs/$CHAIN_NAME/$CHAIN_NAME-deploy-nexus-errors.log 
+        forge script DeployNexus false --sig "run(bool)" --rpc-url $CHAIN_RPC_URL --etherscan-api-key $CHAIN_NAME --private-key $PRIVATE_KEY $VERIFY -vv --broadcast --slow $GAS_SUFFIX 1> ./logs/$CHAIN_NAME/$CHAIN_NAME-deploy-nexus.log 2> ./logs/$CHAIN_NAME/$CHAIN_NAME-deploy-nexus-errors.log 
     } || {
         printf "Deployment failed\n See logs for more details\n"
         exit 1
