@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.27;
+pragma solidity ^0.8.27;
 
 library LocalCallDataParserLib {
     /// @dev Parses the `userOp.signature` to extract the module type, module initialization data,
@@ -11,18 +11,10 @@ library LocalCallDataParserLib {
     /// @return moduleInitData Initialization data specific to the module.
     /// @return enableModeSignature Signature used to enable the module mode.
     /// @return userOpSignature The remaining user operation signature data.
-    function parseEnableModeData(
-        bytes calldata packedData
-    )
+    function parseEnableModeData(bytes calldata packedData)
         internal
         pure
-        returns (
-            address module,
-            uint256 moduleType,
-            bytes calldata moduleInitData,
-            bytes calldata enableModeSignature,
-            bytes calldata userOpSignature
-        )
+        returns (address module, uint256 moduleType, bytes calldata moduleInitData, bytes calldata enableModeSignature, bytes calldata userOpSignature)
     {
         uint256 p;
         assembly ("memory-safe") {
