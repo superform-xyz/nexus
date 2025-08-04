@@ -23,7 +23,7 @@ contract DeployNexus is Script {
     bytes32 constant NEXUS_ACCOUNT_FACTORY_SALT = 0x0000000000000000000000000000000000000000e289724d34a3660389fc1ab0; //  =>
         // 0x000000001D1D5004a02bAfAb9de2D6CE5b7B13de;
 
-    address internal defaultValidator = address(0xDF1e60d1Dd1bEf8E37ECac132c04a4D7D41A6ca6); // SuperValidator
+    address internal defaultValidator = address(0x00000000d12897DDAdC2044614A9677B191A2d95); // MEE K1 Validator v0.0.1
 
     function setUp() public { }
 
@@ -40,7 +40,7 @@ contract DeployNexus is Script {
 
         bytes32 salt = NEXUS_SALT;
         bytes memory bytecode = vm.getCode("scripts/bash-deploy/artifacts/Nexus/Nexus.json");
-        bytes memory args = abi.encode(EP_V07_ADDRESS, defaultValidator, abi.encode(address(eEeEeAddress)));
+        bytes memory args = abi.encode(EP_V07_ADDRESS, defaultValidator, abi.encodePacked(eEeEeAddress));
         address nexus = DeterministicDeployerLib.computeAddress(bytecode, args, salt);
         uint256 codeSize;
         assembly {
@@ -55,7 +55,7 @@ contract DeployNexus is Script {
 
         salt = NEXUSBOOTSTRAP_SALT;
         bytecode = vm.getCode("scripts/bash-deploy/artifacts/NexusBootstrap/NexusBootstrap.json");
-        args = abi.encode(defaultValidator, abi.encode(address(eEeEeAddress)));
+        args = abi.encode(defaultValidator, abi.encodePacked(eEeEeAddress));
         address bootstrap = DeterministicDeployerLib.computeAddress(bytecode, args, salt);
         assembly {
             codeSize := extcodesize(bootstrap)
@@ -96,7 +96,7 @@ contract DeployNexus is Script {
 
         bytes32 salt = NEXUS_SALT;
         bytes memory bytecode = vm.getCode("scripts/bash-deploy/artifacts/Nexus/Nexus.json");
-        bytes memory args = abi.encode(EP_V07_ADDRESS, defaultValidator, abi.encode(address(eEeEeAddress)));
+        bytes memory args = abi.encode(EP_V07_ADDRESS, defaultValidator, abi.encodePacked(eEeEeAddress));
         address nexus = DeterministicDeployerLib.computeAddress(bytecode, args, salt);
 
         uint256 codeSize;
@@ -114,7 +114,7 @@ contract DeployNexus is Script {
 
         salt = NEXUSBOOTSTRAP_SALT;
         bytecode = vm.getCode("scripts/bash-deploy/artifacts/NexusBootstrap/NexusBootstrap.json");
-        args = abi.encode(defaultValidator, abi.encode(address(eEeEeAddress)));
+        args = abi.encode(defaultValidator, abi.encodePacked(eEeEeAddress));
         address bootstrap = DeterministicDeployerLib.computeAddress(bytecode, args, salt);
         assembly {
             codeSize := extcodesize(bootstrap)
@@ -149,7 +149,7 @@ contract DeployNexus is Script {
 
         salt = 0x0000000000000000000000000000000000000000000000000000000000000001;
         bytes memory initData =
-            abi.encode(bootstrap, abi.encodeWithSelector(NexusBootstrap.initNexusWithDefaultValidator.selector, abi.encode(address(eEeEeAddress))));
+            abi.encode(bootstrap, abi.encodeWithSelector(NexusBootstrap.initNexusWithDefaultValidator.selector, abi.encodePacked(eEeEeAddress)));
         vm.startBroadcast();
         address nexusProxy = NexusAccountFactory(nexusAccountFactory).createAccount(initData, salt);
         vm.stopBroadcast();
