@@ -68,6 +68,9 @@ setup_chain_config() {
         "base")
             CHAIN_RPC_URL=$(op read op://5ylebqljbh3x6zomdxi3qd7tsa/BASE_RPC_URL/credential)
             ;;
+        "demo-ethereum")
+            CHAIN_RPC_URL=$(op read op://5ylebqljbh3x6zomdxi3qd7tsa/DEMO_ETHEREUM_VNET/credential)
+            ;;
         *)
             printf "Unsupported chain: $CHAIN_NAME\n"
             printf "Supported chains: avalanche, plume, ethereum, polygon, arbitrum, base\n"
