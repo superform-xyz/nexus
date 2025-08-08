@@ -23,11 +23,12 @@ contract DeployNexus is Script {
     bytes32 constant NEXUS_ACCOUNT_FACTORY_SALT = 0x0000000000000000000000000000000000000000e289724d34a3660389fc1ab0; //  =>
         // 0x000000001D1D5004a02bAfAb9de2D6CE5b7B13de;
 
-    address internal defaultValidator = address(0xDF1e60d1Dd1bEf8E37ECac132c04a4D7D41A6ca6); // SuperValidator
+    address internal defaultValidator; // Set via script argument
 
     function setUp() public { }
 
-    function run(bool check) public {
+    function run(bool check, address defaultValidator_) public {
+        defaultValidator = defaultValidator_;
         if (check) {
             checkNexusAddress();
         } else {

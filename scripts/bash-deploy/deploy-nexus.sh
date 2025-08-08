@@ -5,7 +5,7 @@
 ### VERIFY INPUTS ###
 printMan() {
     printf "Usage: $0 <Environment: local|mainnet|testnet> <Network Name>\n"
-    printf "Supported networks: avalanche, plume, ethereum, polygon, arbitrum, base\n"
+    printf "Supported networks: main-ethereum, main-op, main-base, demo-ethereum, demo-op, demo-base, avalanche, plume, ethereum, polygon, arbitrum, base\n"
 }
 
 if [ $# -eq 0 ]; then
@@ -50,6 +50,26 @@ PRIVATE_KEY=$(op read op://uppkq2linnagjo7zxcclzjvrvm/V2_Deployer/credential)
 # Define chain configurations - Load RPC URLs directly from OnePassword
 setup_chain_config() {
     case $CHAIN_NAME in
+        # New main/demo chain configs
+        "main-ethereum")
+            CHAIN_RPC_URL=$(op read op://5ylebqljbh3x6zomdxi3qd7tsa/MAIN_ETHEREUM_VNET/credential)
+            ;;
+        "main-op")
+            CHAIN_RPC_URL=$(op read op://5ylebqljbh3x6zomdxi3qd7tsa/MAIN_OPTIMISM_VNET/credential)
+            ;;
+        "main-base")
+            CHAIN_RPC_URL=$(op read op://5ylebqljbh3x6zomdxi3qd7tsa/MAIN_BASE_VNET/credential)
+            ;;
+        "demo-ethereum")
+            CHAIN_RPC_URL=$(op read op://5ylebqljbh3x6zomdxi3qd7tsa/DEMO_ETHEREUM_VNET/credential)
+            ;;
+        "demo-op")
+            CHAIN_RPC_URL=$(op read op://5ylebqljbh3x6zomdxi3qd7tsa/DEMO_OPTIMISM_VNET/credential)
+            ;;
+        "demo-base")
+            CHAIN_RPC_URL=$(op read op://5ylebqljbh3x6zomdxi3qd7tsa/DEMO_BASE_VNET/credential)
+            ;;
+        # Pre-existing chain configs (kept)
         "avalanche")
             CHAIN_RPC_URL=$(op read op://5ylebqljbh3x6zomdxi3qd7tsa/AVALANCHE_RPC_URL/credential)
             ;;
@@ -68,19 +88,30 @@ setup_chain_config() {
         "base")
             CHAIN_RPC_URL=$(op read op://5ylebqljbh3x6zomdxi3qd7tsa/BASE_RPC_URL/credential)
             ;;
-        "demo-ethereum")
-            CHAIN_RPC_URL=$(op read op://5ylebqljbh3x6zomdxi3qd7tsa/DEMO_ETHEREUM_VNET/credential)
-            ;;
         *)
             printf "Unsupported chain: $CHAIN_NAME\n"
-            printf "Supported chains: avalanche, plume, ethereum, polygon, arbitrum, base\n"
+            printf "Supported chains: main-ethereum, main-op, main-base, demo-ethereum, demo-op, demo-base, avalanche, plume, ethereum, polygon, arbitrum, base\n"
             exit 1
             ;;
     esac
 }
 
-# Set up chain configuration
+# Determine default validator per chain group
+compute_default_validator() {
+    PREV_DEFAULT_VALIDATOR=0xDF1e60d1Dd1bEf8E37ECac132c04a4D7D41A6ca6
+    # demos use zero address; mains share a fixed validator; others fallback to previous default
+    if [[ $CHAIN_NAME == demo-* ]]; then
+        DEFAULT_VALIDATOR=$(cast address-zero)
+    elif [[ $CHAIN_NAME == main-* ]]; then
+        DEFAULT_VALIDATOR=0x5283C930593C02538c36648953ebd3913aa5a8ab
+    else
+        DEFAULT_VALIDATOR=$PREV_DEFAULT_VALIDATOR
+    fi
+}
+
+# Set up chain configuration and defaults
 setup_chain_config
+compute_default_validator
 
 ### DEPLOY PRE-REQUISITES ###
 { (bash deploy-prerequisites.sh $PRIVATE_KEY $ENVIRONMENT $CHAIN_NAME $CHAIN_RPC_URL) } || {
@@ -130,8 +161,8 @@ else
 fi
 
 ### DEPLOY NEXUS SCs ###
-printf "Addresses for Nexus SCs:\n"
-forge script DeployNexus true --sig "run(bool)" --rpc-url $CHAIN_RPC_URL -vv | grep -e "Addr" -e "already deployed"
+printf "Addresses for Nexus SCs (validator: $DEFAULT_VALIDATOR):\n"
+forge script DeployNexus true $DEFAULT_VALIDATOR --sig "run(bool,address)" --rpc-url $CHAIN_RPC_URL -vv | grep -e "Addr" -e "already deployed"
 printf "Do you want to proceed with the addresses above? (y/n): "
 read -r proceed
 if [ $proceed = "y" ]; then
@@ -156,9 +187,9 @@ if [ $proceed = "y" ]; then
         SHOULD_VERIFY=false
         
         if [ "$SHOULD_VERIFY" = true ]; then
-            forge script DeployNexus false --sig "run(bool)" --rpc-url $CHAIN_RPC_URL --etherscan-api-key $CHAIN_NAME --private-key $PRIVATE_KEY $VERIFY -vv --broadcast --slow $GAS_SUFFIX 1> ./logs/$CHAIN_NAME/$CHAIN_NAME-deploy-nexus.log 2> ./logs/$CHAIN_NAME/$CHAIN_NAME-deploy-nexus-errors.log
+            forge script DeployNexus false $DEFAULT_VALIDATOR --sig "run(bool,address)" --rpc-url $CHAIN_RPC_URL --etherscan-api-key $CHAIN_NAME --private-key $PRIVATE_KEY $VERIFY -vv --broadcast --slow $GAS_SUFFIX 1> ./logs/$CHAIN_NAME/$CHAIN_NAME-deploy-nexus.log 2> ./logs/$CHAIN_NAME/$CHAIN_NAME-deploy-nexus-errors.log
         else
-            forge script DeployNexus false --sig "run(bool)" --rpc-url $CHAIN_RPC_URL --private-key $PRIVATE_KEY -vv --broadcast --slow $GAS_SUFFIX 1> ./logs/$CHAIN_NAME/$CHAIN_NAME-deploy-nexus.log 2> ./logs/$CHAIN_NAME/$CHAIN_NAME-deploy-nexus-errors.log
+            forge script DeployNexus false $DEFAULT_VALIDATOR --sig "run(bool,address)" --rpc-url $CHAIN_RPC_URL --private-key $PRIVATE_KEY -vv --broadcast --slow $GAS_SUFFIX 1> ./logs/$CHAIN_NAME/$CHAIN_NAME-deploy-nexus.log 2> ./logs/$CHAIN_NAME/$CHAIN_NAME-deploy-nexus-errors.log
         fi
     } || {
         printf "Deployment failed\n See logs for more details\n"
