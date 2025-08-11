@@ -39,6 +39,9 @@ if [ -n "$PRESET" ]; then
         demo)
             CHAINS=("demo-ethereum" "demo-op" "demo-base")
             ;;
+        staging)
+            CHAINS=("staging-bsc" "staging-ethereum" "staging-arbitrum" "staging-base")
+            ;;
         *)
             printf "Unknown preset: %s\n" "$PRESET"
             exit 1

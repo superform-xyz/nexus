@@ -70,22 +70,16 @@ setup_chain_config() {
             CHAIN_RPC_URL=$(op read op://5ylebqljbh3x6zomdxi3qd7tsa/DEMO_BASE_VNET/credential)
             ;;
         # Pre-existing chain configs (kept)
-        "avalanche")
-            CHAIN_RPC_URL=$(op read op://5ylebqljbh3x6zomdxi3qd7tsa/AVALANCHE_RPC_URL/credential)
+        "staging-bsc")
+            CHAIN_RPC_URL=$(op read op://5ylebqljbh3x6zomdxi3qd7tsa/BSC_RPC_URL/credential)
             ;;
-        "plume")
-            CHAIN_RPC_URL=$(op read op://5ylebqljbh3x6zomdxi3qd7tsa/PLUME_RPC_URL/credential)
-            ;;
-        "ethereum")
+        "staging-ethereum")
             CHAIN_RPC_URL=$(op read op://5ylebqljbh3x6zomdxi3qd7tsa/ETHEREUM_RPC_URL/credential)
             ;;
-        "polygon")
-            CHAIN_RPC_URL=$(op read op://5ylebqljbh3x6zomdxi3qd7tsa/POLYGON_RPC_URL/credential)
-            ;;
-        "arbitrum")
+        "staging-arbitrum")
             CHAIN_RPC_URL=$(op read op://5ylebqljbh3x6zomdxi3qd7tsa/ARBITRUM_RPC_URL/credential)
             ;;
-        "base")
+        "staging-base")
             CHAIN_RPC_URL=$(op read op://5ylebqljbh3x6zomdxi3qd7tsa/BASE_RPC_URL/credential)
             ;;
         *)
@@ -99,11 +93,12 @@ setup_chain_config() {
 # Determine default validator per chain group
 compute_default_validator() {
     PREV_DEFAULT_VALIDATOR=0xDF1e60d1Dd1bEf8E37ECac132c04a4D7D41A6ca6
-    # demos use zero address; mains share a fixed validator; others fallback to previous default
     if [[ $CHAIN_NAME == demo-* ]]; then
-        DEFAULT_VALIDATOR=$(cast address-zero)
+        DEFAULT_VALIDATOR=0xca4876F52f2b8A2c6095A337D49cAcd6816B3477
     elif [[ $CHAIN_NAME == main-* ]]; then
         DEFAULT_VALIDATOR=0x5283C930593C02538c36648953ebd3913aa5a8ab
+    elif [[ $CHAIN_NAME == staging-* ]]; then
+        DEFAULT_VALIDATOR=0x229822FAd0DB012BF2863dD6c7739703fc4b8260
     else
         DEFAULT_VALIDATOR=$PREV_DEFAULT_VALIDATOR
     fi
@@ -200,7 +195,6 @@ if [ $proceed = "y" ]; then
     
 else 
     printf "Exiting\n"
-    exit 1
 fi  
 
 
