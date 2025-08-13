@@ -1,7 +1,7 @@
 
 
 
-#!/bin/bash
+#!/usr/bin/env bash
 
 ## Checks and deploys if not deployed:
 # - Deterministic deployer (Create2 Factory) https://github.com/Arachnid/deterministic-deployment-proxy

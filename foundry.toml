@@ -18,7 +18,10 @@
   cache_path  = "cache_forge"
   libs = ["node_modules", "lib"]
   gas_reports_ignore = ["MockToken"]
-  fs_permissions = [{ access = "read", path = "scripts/bash-deploy/artifacts"}]
+  fs_permissions = [
+    { access = "read", path = "scripts/bash-deploy/artifacts"},
+    { access = "write", path = "scripts/bash-deploy/deployment"}
+  ]
 
 [profile.via-ir]
   via-ir = true

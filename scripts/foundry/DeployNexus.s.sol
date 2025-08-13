@@ -11,6 +11,16 @@ contract DeployNexus is Script {
     uint256 deployed;
     uint256 total;
 
+    // Contract address tracking per chain
+    mapping(uint64 chainId => mapping(string contractName => address contractAddress)) public contractAddresses;
+
+    // Contract export tracking
+    mapping(uint64 => string) private exportedContracts;
+    mapping(uint64 => uint256) private contractCount;
+
+    // Environment and chain name mappings
+    mapping(uint64 => string) public chainNames;
+
     address public constant REGISTRY_ADDRESS = 0x000000000069E2a187AEFFb852bF3cCdC95151B2;
     address public constant EP_V07_ADDRESS = 0x0000000071727De22E5E9d8BAf0edAc6f37da032;
     address public constant eEeEeAddress = address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
@@ -25,7 +35,17 @@ contract DeployNexus is Script {
 
     address internal defaultValidator; // Set via script argument
 
-    function setUp() public { }
+    function setUp() public {
+        // Initialize chain name mappings (matches S3 format with proper case)
+        chainNames[1] = "Ethereum";
+        chainNames[10] = "Optimism";
+        chainNames[8453] = "Base";
+        chainNames[137] = "Polygon";
+        chainNames[42_161] = "Arbitrum";
+        chainNames[43_114] = "Avalanche";
+        chainNames[56] = "BSC";
+        chainNames[98_866] = "Plume";
+    }
 
     function run(bool check, address defaultValidator_) public {
         defaultValidator = defaultValidator_;
@@ -111,6 +131,9 @@ contract DeployNexus is Script {
             console2.log("Nexus deployed at: %s. Default validator: %s", nexus, defaultValidator);
         }
 
+        // Export Nexus contract
+        _exportContract("Nexus", nexus, uint64(block.chainid));
+
         // ======== NexusBootstrap ========
 
         salt = NEXUSBOOTSTRAP_SALT;
@@ -126,6 +149,9 @@ contract DeployNexus is Script {
             bootstrap = DeterministicDeployerLib.broadcastDeploy(bytecode, args, salt);
             console2.log("Nexus Bootstrap deployed at: ", bootstrap);
         }
+
+        // Export NexusBootstrap contract
+        _exportContract("NexusBootstrap", bootstrap, uint64(block.chainid));
 
         // ======== NexusAccountFactory ========
 
@@ -146,6 +172,9 @@ contract DeployNexus is Script {
             console2.log("Nexus Account Factory deployed at: ", nexusAccountFactory);
         }
 
+        // Export NexusAccountFactory contract
+        _exportContract("NexusAccountFactory", nexusAccountFactory, uint64(block.chainid));
+
         // ======== NexusProxy ========
 
         salt = 0x0000000000000000000000000000000000000000000000000000000000000001;
@@ -155,6 +184,9 @@ contract DeployNexus is Script {
         address nexusProxy = NexusAccountFactory(nexusAccountFactory).createAccount(initData, salt);
         vm.stopBroadcast();
         console2.log("Nexus Proxy deployed at: ", nexusProxy);
+
+        // Export NexusProxy contract
+        _exportContract("NexusProxy", nexusProxy, uint64(block.chainid));
     }
 
     function checkDeployed(uint256 codeSize) internal {
@@ -162,5 +194,79 @@ contract DeployNexus is Script {
             deployed++;
         }
         total++;
+    }
+
+    /// @notice Export a contract address for JSON serialization
+    /// @param contractName Name of the contract
+    /// @param addr Address of the contract
+    /// @param chainId Chain ID
+    function _exportContract(string memory contractName, address addr, uint64 chainId) internal {
+        contractCount[chainId]++;
+        string memory objectKey = string(abi.encodePacked("NEXUS_EXPORTS_", vm.toString(uint256(chainId))));
+        exportedContracts[chainId] = vm.serializeAddress(objectKey, contractName, addr);
+
+        // Store in mapping for reference
+        contractAddresses[chainId][contractName] = addr;
+
+        console2.log("Exported %s: %s for chain %d", contractName, addr, chainId);
+    }
+
+    /// @notice Write exported contracts to environment-specific JSON files
+    /// @param chainId Chain ID
+    /// @param environment Environment name (main, demo, staging, production)
+    function _writeExportedContracts(uint64 chainId, string memory environment) internal {
+        if (contractCount[chainId] == 0) return;
+
+        string memory chainName = chainNames[chainId];
+        require(bytes(chainName).length > 0, "Chain name not configured");
+
+        string memory root = vm.projectRoot();
+        string memory deploymentFolder = string(abi.encodePacked("/scripts/bash-deploy/deployment/", environment, "/", vm.toString(uint256(chainId)), "/"));
+
+        // Create directory if it doesn't exist
+        vm.createDir(string(abi.encodePacked(root, deploymentFolder)), true);
+
+        // Write to {chainName}.json (e.g., ethereum.json, optimism.json)
+        string memory outputPath = string(abi.encodePacked(root, deploymentFolder, chainName, ".json"));
+        vm.writeJson(exportedContracts[chainId], outputPath);
+
+        console2.log("Exported %d contracts to: %s", contractCount[chainId], outputPath);
+    }
+
+    /// @notice Get environment from chain name prefix
+    /// @param chainNameInput Chain name with environment prefix (e.g., "main-ethereum", "demo-base")
+    /// @return environment The environment name
+    function _getEnvironmentFromChainName(string memory chainNameInput) internal pure returns (string memory environment) {
+        bytes memory chainBytes = bytes(chainNameInput);
+
+        // Check for main- prefix
+        if (chainBytes.length >= 5 && chainBytes[0] == "m" && chainBytes[1] == "a" && chainBytes[2] == "i" && chainBytes[3] == "n" && chainBytes[4] == "-") {
+            return "main";
+        }
+
+        // Check for demo- prefix
+        if (chainBytes.length >= 5 && chainBytes[0] == "d" && chainBytes[1] == "e" && chainBytes[2] == "m" && chainBytes[3] == "o" && chainBytes[4] == "-") {
+            return "demo";
+        }
+
+        // Check for staging- prefix
+        if (
+            chainBytes.length >= 8 && chainBytes[0] == "s" && chainBytes[1] == "t" && chainBytes[2] == "a" && chainBytes[3] == "g" && chainBytes[4] == "i"
+                && chainBytes[5] == "n" && chainBytes[6] == "g" && chainBytes[7] == "-"
+        ) {
+            return "staging";
+        }
+
+        // Default to production for standalone chain names
+        return "production";
+    }
+
+    /// @notice Deploy and export contracts
+    /// @param environment Environment name
+    /// @param defaultValidator_ Default validator address
+    function runDeploy(string memory environment, address defaultValidator_) public {
+        defaultValidator = defaultValidator_;
+        deployNexus();
+        _writeExportedContracts(uint64(block.chainid), environment);
     }
 }
