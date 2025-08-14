@@ -20,7 +20,7 @@ declare -A CHAIN_NAMES=(
     ["137"]="Polygon"
     ["42161"]="Arbitrum"
     ["43114"]="Avalanche"
-    ["56"]="BSC"
+    ["56"]="BNB"
     ["98866"]="Plume"
 )
 
@@ -83,7 +83,7 @@ get_default_validator() {
     elif [[ $chain_name == main-* ]]; then
         echo "0x37Fe31C1CA7E1eF4b7aD418b77F01318a977716e"
     elif [[ $chain_name == staging-* ]]; then
-        echo "0x229822FAd0DB012BF2863dD6c7739703fc4b8260"
+        echo "0x5C563Ba4881e3c2710BABe76282895EfE5C8247d"
     else
         echo "$prev_default_validator"
     fi
@@ -115,7 +115,7 @@ get_rpc_url() {
             op read op://5ylebqljbh3x6zomdxi3qd7tsa/DEMO_BASE_VNET/credential
             ;;
         # Staging environment chains
-        "staging-bsc")
+        "staging-bnb")
             op read op://5ylebqljbh3x6zomdxi3qd7tsa/BSC_RPC_URL/credential
             ;;
         "staging-ethereum")
@@ -129,7 +129,7 @@ get_rpc_url() {
             ;;
         *)
             echo "ERROR: Unsupported chain: $chain_name" >&2
-            echo "Supported chains: main-ethereum, main-op, main-base, demo-ethereum, demo-op, demo-base, staging-bsc, staging-ethereum, staging-arbitrum, staging-base" >&2
+            echo "Supported chains: main-ethereum, main-op, main-base, demo-ethereum, demo-op, demo-base, staging-bnb, staging-ethereum, staging-arbitrum, staging-base" >&2
             return 1
             ;;
     esac
@@ -147,7 +147,7 @@ get_preset_chains() {
             echo "demo-ethereum demo-op demo-base"
             ;;
         "staging")
-            echo "staging-bsc staging-ethereum staging-arbitrum staging-base"
+            echo "staging-bnb staging-ethereum staging-arbitrum staging-base"
             ;;
         *)
             echo "ERROR: Unknown preset: $preset" >&2
@@ -234,6 +234,6 @@ print_network_summary() {
     echo "Available Presets:"
     echo "  main    -> main-ethereum main-op main-base"
     echo "  demo    -> demo-ethereum demo-op demo-base"  
-    echo "  staging -> staging-bsc staging-ethereum staging-arbitrum staging-base"
+    echo "  staging -> staging-bnb staging-ethereum staging-arbitrum staging-base"
     echo "=========================="
 }
