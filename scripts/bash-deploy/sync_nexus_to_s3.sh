@@ -19,7 +19,7 @@ print_header() {
     echo -e "${CYAN}╔══════════════════════════════════════════════════════════════════════════════════════╗${NC}"
     echo -e "${CYAN}║                                                                                      ║${NC}"
     echo -e "${CYAN}║${WHITE}                    📤 Nexus S3 Sync Script 📤                                      ${CYAN}║${NC}"
-    echo -e "${CYAN}║${WHITE}             (NexusBootstrap & NexusAccountFactory Only)                          ${CYAN}║${NC}"
+    echo -e "${CYAN}║${WHITE}           (Nexus, NexusBootstrap & NexusAccountFactory Only)                    ${CYAN}║${NC}"
     echo -e "${CYAN}║                                                                                      ║${NC}"
     echo -e "${CYAN}╚══════════════════════════════════════════════════════════════════════════════════════╝${NC}"
 }
@@ -62,9 +62,9 @@ validate_network_exists() {
 filter_allowed_contracts() {
     local contracts_json=$1
     local network_name=$2
-    local allowed_contracts=("NexusBootstrap" "NexusAccountFactory")
+    local allowed_contracts=("Nexus" "NexusBootstrap" "NexusAccountFactory")
     
-    log "INFO" "Filtering contracts for $network_name to only include NexusBootstrap and NexusAccountFactory"
+    log "INFO" "Filtering contracts for $network_name to only include Nexus, NexusBootstrap and NexusAccountFactory"
     
     # Create filtered JSON with only allowed contracts
     local filtered_json="{}"
@@ -195,10 +195,16 @@ process_all_nexus_updates() {
         # Extract existing contracts and update only Nexus contracts
         local existing_contracts=$(echo "$updated_content" | jq -r ".networks[\"$network_name\"].contracts // {}")
         
+        local nexus=$(echo "$filtered_contracts" | jq -r '.Nexus // empty')
         local nexus_bootstrap=$(echo "$filtered_contracts" | jq -r '.NexusBootstrap // empty')
         local nexus_account_factory=$(echo "$filtered_contracts" | jq -r '.NexusAccountFactory // empty')
         
         local updates_made=()
+        
+        if [ -n "$nexus" ] && [ "$nexus" != "empty" ]; then
+            existing_contracts=$(echo "$existing_contracts" | jq --arg addr "$nexus" '.Nexus = $addr')
+            updates_made+=("Nexus: $nexus")
+        fi
         
         if [ -n "$nexus_bootstrap" ] && [ "$nexus_bootstrap" != "empty" ]; then
             existing_contracts=$(echo "$existing_contracts" | jq --arg addr "$nexus_bootstrap" '.NexusBootstrap = $addr')
@@ -260,7 +266,7 @@ process_all_nexus_updates() {
         local network_exists=$(echo "$updated_content" | jq -r ".networks[\"$network_name\"] // empty")
         if [ -n "$network_exists" ] && [ "$network_exists" != "null" ]; then
             echo -e "${CYAN}📍 $network_name:${NC}"
-            echo "$updated_content" | jq ".networks[\"$network_name\"] | {contracts: {NexusBootstrap: .contracts.NexusBootstrap, NexusAccountFactory: .contracts.NexusAccountFactory}}"
+            echo "$updated_content" | jq ".networks[\"$network_name\"] | {contracts: {Nexus: .contracts.Nexus, NexusBootstrap: .contracts.NexusBootstrap, NexusAccountFactory: .contracts.NexusAccountFactory}}"
             echo ""
         fi
     done
