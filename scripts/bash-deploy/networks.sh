@@ -124,12 +124,15 @@ get_rpc_url() {
         "staging-arbitrum")
             op read op://5ylebqljbh3x6zomdxi3qd7tsa/ARBITRUM_RPC_URL/credential
             ;;
+        "staging-avalanche")
+            op read op://5ylebqljbh3x6zomdxi3qd7tsa/AVALANCHE_RPC_URL/credential
+            ;;
         "staging-base")
             op read op://5ylebqljbh3x6zomdxi3qd7tsa/BASE_RPC_URL/credential
             ;;
         *)
             echo "ERROR: Unsupported chain: $chain_name" >&2
-            echo "Supported chains: main-ethereum, main-op, main-base, demo-ethereum, demo-op, demo-base, staging-bnb, staging-ethereum, staging-arbitrum, staging-base" >&2
+            echo "Supported chains: main-ethereum, main-op, main-base, demo-ethereum, demo-op, demo-base, staging-bnb, staging-ethereum, staging-arbitrum, staging-avalanche, staging-base" >&2
             return 1
             ;;
     esac
@@ -147,7 +150,7 @@ get_preset_chains() {
             echo "demo-ethereum demo-op demo-base"
             ;;
         "staging")
-            echo "staging-bnb staging-ethereum staging-arbitrum staging-base"
+            echo "staging-bnb staging-ethereum staging-arbitrum staging-avalanche staging-base"
             ;;
         *)
             echo "ERROR: Unknown preset: $preset" >&2
@@ -234,6 +237,6 @@ print_network_summary() {
     echo "Available Presets:"
     echo "  main    -> main-ethereum main-op main-base"
     echo "  demo    -> demo-ethereum demo-op demo-base"  
-    echo "  staging -> staging-bnb staging-ethereum staging-arbitrum staging-base"
+    echo "  staging -> staging-bnb staging-ethereum staging-arbitrum staging-avalanche staging-base"
     echo "=========================="
 }
