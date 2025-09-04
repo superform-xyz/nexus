@@ -4,7 +4,7 @@
 ### VERIFY INPUTS ###
 printMan() {
     printf "Usage: $0 <Environment: local|mainnet|testnet> <Network Name>\n"
-    printf "Supported networks: main-ethereum, main-op, main-base, demo-ethereum, demo-op, demo-base, avalanche, plume, ethereum, polygon, arbitrum, base\n"
+    printf "Supported networks: main-ethereum, main-op, main-base, demo-ethereum, demo-op, demo-base, staging-bnb, staging-ethereum, staging-arbitrum, staging-avalanche, staging-base, prod-ethereum, prod-optimism, prod-base, prod-polygon, prod-arbitrum, prod-avalanche, prod-bnb, prod-unichain, prod-berachain, prod-sonic, prod-gnosis, prod-worldchain\n"
 }
 
 if [ $# -eq 0 ]; then
@@ -54,7 +54,7 @@ PRIVATE_KEY=$(op read op://uppkq2linnagjo7zxcclzjvrvm/V2_Deployer/credential)
 setup_chain_config() {
     if ! validate_chain_name "$CHAIN_NAME"; then
         printf "Unsupported chain: $CHAIN_NAME\n"
-        printf "Supported chains: main-ethereum, main-op, main-base, demo-ethereum, demo-op, demo-base, staging-bsc, staging-ethereum, staging-arbitrum, staging-base\n"
+        printf "Supported chains: main-ethereum, main-op, main-base, demo-ethereum, demo-op, demo-base, staging-bnb, staging-ethereum, staging-arbitrum, staging-avalanche, staging-base, prod-ethereum, prod-optimism, prod-base, prod-polygon, prod-arbitrum, prod-avalanche, prod-bnb, prod-unichain, prod-berachain, prod-sonic, prod-gnosis, prod-worldchain\n"
         exit 1
     fi
     

@@ -43,8 +43,12 @@ contract DeployNexus is Script {
         chainNames[137] = "Polygon";
         chainNames[42_161] = "Arbitrum";
         chainNames[43_114] = "Avalanche";
-        chainNames[56] = "BSC";
-        chainNames[98_866] = "Plume";
+        chainNames[56] = "BNB";
+        chainNames[130] = "Unichain";
+        chainNames[80_094] = "Berachain";
+        chainNames[146] = "Sonic";
+        chainNames[100] = "Gnosis";
+        chainNames[480] = "Worldchain";
     }
 
     function run(bool check, address defaultValidator_) public {

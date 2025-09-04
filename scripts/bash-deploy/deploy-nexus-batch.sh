@@ -5,11 +5,13 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/networks.sh"
 
 printMan() {
-    printf "Usage: $0 <Environment: local|mainnet|testnet> [--preset <main|demo|staging>] [chain1 chain2 ...]\n"
+    printf "Usage: $0 <Environment: local|mainnet|testnet> [--preset <main|demo|staging|production>] [chain1 chain2 ...]\n"
     printf "Examples:\n"
     printf "  $0 mainnet --preset main\n"
     printf "  $0 testnet demo-ethereum demo-op demo-base\n"
     printf "  $0 mainnet --preset staging\n"
+    printf "  $0 mainnet --preset production\n"
+    printf "  $0 mainnet prod-ethereum prod-base prod-arbitrum\n"
 }
 
 if [ $# -lt 1 ]; then
