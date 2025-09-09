@@ -13,14 +13,14 @@ jobs:
       - uses: actions/checkout@v4.1.6
 
       - name: Check package.json
-        uses: tj-actions/changed-files@v44.5.1
+        uses: tj-actions/changed-files@v45.0.8
         id: package-json
         with:
           files: |
             package.json
 
       - name: Check CHANGELOG.md
-        uses: tj-actions/changed-files@v44.5.1
+        uses: tj-actions/changed-files@v45.0.8
         id: changelog
         with:
           files: |
