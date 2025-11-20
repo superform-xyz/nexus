@@ -88,7 +88,7 @@ get_default_validator() {
     local prev_default_validator="0xDF1e60d1Dd1bEf8E37ECac132c04a4D7D41A6ca6"
     
     if [[ $chain_name == demo-* ]]; then
-        echo "0xddf190C06930242986AA419be8567F3eA1BFfD8c"
+        echo "0x8Ad8e6c02A8d031D5E7024C15Ed2948D03051c40"
     elif [[ $chain_name == main-* ]]; then
         echo "0x37Fe31C1CA7E1eF4b7aD418b77F01318a977716e"
     elif [[ $chain_name == staging-* ]]; then
