@@ -49,6 +49,7 @@ contract DeployNexus is Script {
         chainNames[146] = "Sonic";
         chainNames[100] = "Gnosis";
         chainNames[480] = "Worldchain";
+        chainNames[999] = "Hyperliquid";
     }
 
     function run(bool check, address defaultValidator_) public {

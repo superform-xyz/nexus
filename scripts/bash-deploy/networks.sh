@@ -15,7 +15,7 @@ fi
 # Chain ID to chain name mappings (matches S3 format with proper case)
 declare -A CHAIN_NAMES=(
     ["1"]="Ethereum"
-    ["10"]="Optimism" 
+    ["10"]="Optimism"
     ["8453"]="Base"
     ["137"]="Polygon"
     ["42161"]="Arbitrum"
@@ -26,6 +26,7 @@ declare -A CHAIN_NAMES=(
     ["146"]="Sonic"
     ["100"]="Gnosis"
     ["480"]="Worldchain"
+    ["999"]="Hyperliquid"
 )
 
 # Get chain name from chain ID
@@ -178,9 +179,12 @@ get_rpc_url() {
         "prod-worldchain")
             op read op://5ylebqljbh3x6zomdxi3qd7tsa/WORLDCHAIN_RPC_URL/credential
             ;;
+        "prod-hyperliquid")
+            echo "https://rpc.hyperliquid.xyz/evm"
+            ;;
         *)
             echo "ERROR: Unsupported chain: $chain_name" >&2
-            echo "Supported chains: main-ethereum, main-op, main-base, demo-ethereum, demo-op, demo-base, staging-bnb, staging-ethereum, staging-arbitrum, staging-avalanche, staging-base, prod-ethereum, prod-optimism, prod-base, prod-polygon, prod-arbitrum, prod-avalanche, prod-bnb, prod-unichain, prod-berachain, prod-sonic, prod-gnosis, prod-worldchain" >&2
+            echo "Supported chains: main-ethereum, main-op, main-base, demo-ethereum, demo-op, demo-base, staging-bnb, staging-ethereum, staging-arbitrum, staging-avalanche, staging-base, prod-ethereum, prod-optimism, prod-base, prod-polygon, prod-arbitrum, prod-avalanche, prod-bnb, prod-unichain, prod-berachain, prod-sonic, prod-gnosis, prod-worldchain, prod-hyperliquid" >&2
             return 1
             ;;
     esac
@@ -201,7 +205,7 @@ get_preset_chains() {
             echo "staging-bnb staging-ethereum staging-arbitrum staging-avalanche staging-base"
             ;;
         "production")
-            echo "prod-ethereum prod-optimism prod-base prod-polygon prod-arbitrum prod-avalanche prod-bnb prod-unichain prod-berachain prod-sonic prod-gnosis prod-worldchain"
+            echo "prod-ethereum prod-optimism prod-base prod-polygon prod-arbitrum prod-avalanche prod-bnb prod-unichain prod-berachain prod-sonic prod-gnosis prod-worldchain prod-hyperliquid"
             ;;
         *)
             echo "ERROR: Unknown preset: $preset" >&2
