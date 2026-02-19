@@ -26,7 +26,7 @@ declare -A CHAIN_NAMES=(
     ["146"]="Sonic"
     ["100"]="Gnosis"
     ["480"]="Worldchain"
-    ["999"]="Hyperliquid"
+    ["999"]="HyperEVM"
 )
 
 # Get chain name from chain ID
@@ -142,6 +142,9 @@ get_rpc_url() {
         "staging-base")
             op read op://5ylebqljbh3x6zomdxi3qd7tsa/BASE_RPC_URL/credential
             ;;
+        "staging-hyperevm")
+            op read op://5ylebqljbh3x6zomdxi3qd7tsa/HYPEREVM_RPC_URL/credential
+            ;;
         # Production environment chains
         "prod-ethereum")
             op read op://5ylebqljbh3x6zomdxi3qd7tsa/ETHEREUM_RPC_URL/credential
@@ -184,7 +187,7 @@ get_rpc_url() {
             ;;
         *)
             echo "ERROR: Unsupported chain: $chain_name" >&2
-            echo "Supported chains: main-ethereum, main-op, main-base, demo-ethereum, demo-op, demo-base, staging-bnb, staging-ethereum, staging-arbitrum, staging-avalanche, staging-base, prod-ethereum, prod-optimism, prod-base, prod-polygon, prod-arbitrum, prod-avalanche, prod-bnb, prod-unichain, prod-berachain, prod-sonic, prod-gnosis, prod-worldchain, prod-hyperliquid" >&2
+            echo "Supported chains: main-ethereum, main-op, main-base, demo-ethereum, demo-op, demo-base, staging-bnb, staging-ethereum, staging-arbitrum, staging-avalanche, staging-base, staging-hyperevm, prod-ethereum, prod-optimism, prod-base, prod-polygon, prod-arbitrum, prod-avalanche, prod-bnb, prod-unichain, prod-berachain, prod-sonic, prod-gnosis, prod-worldchain, prod-hyperliquid" >&2
             return 1
             ;;
     esac
@@ -202,7 +205,7 @@ get_preset_chains() {
             echo "demo-ethereum demo-op demo-base"
             ;;
         "staging")
-            echo "staging-bnb staging-ethereum staging-arbitrum staging-avalanche staging-base"
+            echo "staging-bnb staging-ethereum staging-arbitrum staging-avalanche staging-base staging-hyperevm"
             ;;
         "production")
             echo "prod-ethereum prod-optimism prod-base prod-polygon prod-arbitrum prod-avalanche prod-bnb prod-unichain prod-berachain prod-sonic prod-gnosis prod-worldchain prod-hyperliquid"
@@ -293,7 +296,7 @@ print_network_summary() {
     echo "Available Presets:"
     echo "  main       -> main-ethereum main-op main-base"
     echo "  demo       -> demo-ethereum demo-op demo-base"  
-    echo "  staging    -> staging-bnb staging-ethereum staging-arbitrum staging-avalanche staging-base"
+    echo "  staging    -> staging-bnb staging-ethereum staging-arbitrum staging-avalanche staging-base staging-hyperevm"
     echo "  production -> prod-ethereum prod-optimism prod-base prod-polygon prod-arbitrum prod-avalanche prod-bnb prod-unichain prod-berachain prod-sonic prod-gnosis prod-worldchain"
     echo "=========================="
 }
