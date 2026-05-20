@@ -4,7 +4,7 @@
 ### VERIFY INPUTS ###
 printMan() {
     printf "Usage: $0 <Environment: local|mainnet|testnet> <Network Name>\n"
-    printf "Supported networks: main-ethereum, main-op, main-base, demo-ethereum, demo-op, demo-base, staging-bnb, staging-ethereum, staging-arbitrum, staging-avalanche, staging-base, prod-ethereum, prod-optimism, prod-base, prod-polygon, prod-arbitrum, prod-avalanche, prod-bnb, prod-unichain, prod-berachain, prod-sonic, prod-gnosis, prod-worldchain\n"
+    printf "Supported networks: main-ethereum, main-op, main-base, demo-ethereum, demo-op, demo-base, staging-bnb, staging-ethereum, staging-arbitrum, staging-avalanche, staging-base, staging-hyperevm, staging-flare, staging-stable, prod-ethereum, prod-optimism, prod-base, prod-polygon, prod-arbitrum, prod-avalanche, prod-bnb, prod-unichain, prod-berachain, prod-sonic, prod-gnosis, prod-worldchain, prod-hyperliquid, prod-flare, prod-stable\n"
 }
 
 if [ $# -eq 0 ]; then
@@ -40,21 +40,25 @@ else
     fi
 fi
 
-# Load environment variables from .env (for EP_V07_DEPLOY_TX_DATA and other variables)
-source ../../.env
-
 # Load centralized network configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/networks.sh"
 
-# Load private key from OnePassword for all environments
-PRIVATE_KEY=$(op read op://uppkq2linnagjo7zxcclzjvrvm/V2_Deployer/credential)
+# Load environment variables from .env (for EP_V07_DEPLOY_TX_DATA and other variables)
+source "$SCRIPT_DIR/../../.env"
+
+# Load private key from environment variable (set in .env)
+if [ -z "$MAINNET_DEPLOYER_PRIVATE_KEY" ]; then
+    printf "ERROR: MAINNET_DEPLOYER_PRIVATE_KEY not set in .env\n"
+    exit 1
+fi
+PRIVATE_KEY=$MAINNET_DEPLOYER_PRIVATE_KEY
 
 # Setup chain configuration using centralized networks
 setup_chain_config() {
     if ! validate_chain_name "$CHAIN_NAME"; then
         printf "Unsupported chain: $CHAIN_NAME\n"
-        printf "Supported chains: main-ethereum, main-op, main-base, demo-ethereum, demo-op, demo-base, staging-bnb, staging-ethereum, staging-arbitrum, staging-avalanche, staging-base, prod-ethereum, prod-optimism, prod-base, prod-polygon, prod-arbitrum, prod-avalanche, prod-bnb, prod-unichain, prod-berachain, prod-sonic, prod-gnosis, prod-worldchain\n"
+        printf "Supported chains: main-ethereum, main-op, main-base, demo-ethereum, demo-op, demo-base, staging-bnb, staging-ethereum, staging-arbitrum, staging-avalanche, staging-base, staging-hyperevm, staging-flare, staging-stable, prod-ethereum, prod-optimism, prod-base, prod-polygon, prod-arbitrum, prod-avalanche, prod-bnb, prod-unichain, prod-berachain, prod-sonic, prod-gnosis, prod-worldchain, prod-hyperliquid, prod-flare, prod-stable\n"
         exit 1
     fi
     
@@ -81,7 +85,7 @@ compute_default_validator
 compute_environment
 
 ### DEPLOY PRE-REQUISITES ###
-{ (bash deploy-prerequisites.sh $PRIVATE_KEY $ENVIRONMENT $CHAIN_NAME $CHAIN_RPC_URL) } || {
+{ (bash "$SCRIPT_DIR/deploy-prerequisites.sh" $PRIVATE_KEY $ENVIRONMENT $CHAIN_NAME $CHAIN_RPC_URL) } || {
     printf "Deployment prerequisites failed\n"
     exit 1
 }

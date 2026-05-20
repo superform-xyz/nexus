@@ -15,7 +15,7 @@ fi
 # Chain ID to chain name mappings (matches S3 format with proper case)
 declare -A CHAIN_NAMES=(
     ["1"]="Ethereum"
-    ["10"]="Optimism" 
+    ["10"]="Optimism"
     ["8453"]="Base"
     ["137"]="Polygon"
     ["42161"]="Arbitrum"
@@ -26,6 +26,9 @@ declare -A CHAIN_NAMES=(
     ["146"]="Sonic"
     ["100"]="Gnosis"
     ["480"]="Worldchain"
+    ["999"]="HyperEVM"
+    ["14"]="Flare"
+    ["988"]="Stable"
 )
 
 # Get chain name from chain ID
@@ -141,6 +144,9 @@ get_rpc_url() {
         "staging-base")
             op read op://5ylebqljbh3x6zomdxi3qd7tsa/BASE_RPC_URL/credential
             ;;
+        "staging-hyperevm")
+            op read op://5ylebqljbh3x6zomdxi3qd7tsa/HYPEREVM_RPC_URL/credential
+            ;;
         # Production environment chains
         "prod-ethereum")
             op read op://5ylebqljbh3x6zomdxi3qd7tsa/ETHEREUM_RPC_URL/credential
@@ -178,9 +184,24 @@ get_rpc_url() {
         "prod-worldchain")
             op read op://5ylebqljbh3x6zomdxi3qd7tsa/WORLDCHAIN_RPC_URL/credential
             ;;
+        "prod-hyperliquid")
+            echo "https://rpc.hyperliquid.xyz/evm"
+            ;;
+        "staging-flare")
+            op read op://5ylebqljbh3x6zomdxi3qd7tsa/FLARE_RPC_URL/credential
+            ;;
+        "prod-flare")
+            op read op://5ylebqljbh3x6zomdxi3qd7tsa/FLARE_RPC_URL/credential
+            ;;
+        "staging-stable")
+            op read op://5ylebqljbh3x6zomdxi3qd7tsa/STABLE_RPC_URL/credential
+            ;;
+        "prod-stable")
+            op read op://5ylebqljbh3x6zomdxi3qd7tsa/STABLE_RPC_URL/credential
+            ;;
         *)
             echo "ERROR: Unsupported chain: $chain_name" >&2
-            echo "Supported chains: main-ethereum, main-op, main-base, demo-ethereum, demo-op, demo-base, staging-bnb, staging-ethereum, staging-arbitrum, staging-avalanche, staging-base, prod-ethereum, prod-optimism, prod-base, prod-polygon, prod-arbitrum, prod-avalanche, prod-bnb, prod-unichain, prod-berachain, prod-sonic, prod-gnosis, prod-worldchain" >&2
+            echo "Supported chains: main-ethereum, main-op, main-base, demo-ethereum, demo-op, demo-base, staging-bnb, staging-ethereum, staging-arbitrum, staging-avalanche, staging-base, staging-hyperevm, staging-flare, staging-stable, prod-ethereum, prod-optimism, prod-base, prod-polygon, prod-arbitrum, prod-avalanche, prod-bnb, prod-unichain, prod-berachain, prod-sonic, prod-gnosis, prod-worldchain, prod-hyperliquid, prod-flare, prod-stable" >&2
             return 1
             ;;
     esac
@@ -198,10 +219,10 @@ get_preset_chains() {
             echo "demo-ethereum demo-op demo-base"
             ;;
         "staging")
-            echo "staging-bnb staging-ethereum staging-arbitrum staging-avalanche staging-base"
+            echo "staging-bnb staging-ethereum staging-arbitrum staging-avalanche staging-base staging-hyperevm staging-flare staging-stable"
             ;;
         "production")
-            echo "prod-ethereum prod-optimism prod-base prod-polygon prod-arbitrum prod-avalanche prod-bnb prod-unichain prod-berachain prod-sonic prod-gnosis prod-worldchain"
+            echo "prod-ethereum prod-optimism prod-base prod-polygon prod-arbitrum prod-avalanche prod-bnb prod-unichain prod-berachain prod-sonic prod-gnosis prod-worldchain prod-hyperliquid prod-flare prod-stable"
             ;;
         *)
             echo "ERROR: Unknown preset: $preset" >&2
@@ -289,7 +310,7 @@ print_network_summary() {
     echo "Available Presets:"
     echo "  main       -> main-ethereum main-op main-base"
     echo "  demo       -> demo-ethereum demo-op demo-base"  
-    echo "  staging    -> staging-bnb staging-ethereum staging-arbitrum staging-avalanche staging-base"
-    echo "  production -> prod-ethereum prod-optimism prod-base prod-polygon prod-arbitrum prod-avalanche prod-bnb prod-unichain prod-berachain prod-sonic prod-gnosis prod-worldchain"
+    echo "  staging    -> staging-bnb staging-ethereum staging-arbitrum staging-avalanche staging-base staging-hyperevm staging-flare staging-stable"
+    echo "  production -> prod-ethereum prod-optimism prod-base prod-polygon prod-arbitrum prod-avalanche prod-bnb prod-unichain prod-berachain prod-sonic prod-gnosis prod-worldchain prod-hyperliquid prod-flare prod-stable"
     echo "=========================="
 }

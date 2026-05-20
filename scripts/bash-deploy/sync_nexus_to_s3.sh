@@ -148,7 +148,7 @@ process_all_nexus_updates() {
         fi
         
         # Read deployment file
-        local contracts_file="deployment/$environment/$chain_id/$network_name.json"
+        local contracts_file="$SCRIPT_DIR/deployment/$environment/$chain_id/$network_name.json"
         
         if [ ! -f "$contracts_file" ]; then
             log "ERROR" "Contract file not found: $contracts_file"
@@ -349,7 +349,7 @@ echo -e "${CYAN}   • Environment: $ENVIRONMENT${NC}"
 echo -e "${CYAN}   • S3 Bucket: $S3_BUCKET${NC}"
 print_separator
 
-echo -e "${BLUE}🔍 Scanning for Nexus deployments in deployment/$ENVIRONMENT/...${NC}"
+echo -e "${BLUE}🔍 Scanning for Nexus deployments in $SCRIPT_DIR/deployment/$ENVIRONMENT/...${NC}"
 
 FOUND_DEPLOYMENTS=()
 
@@ -359,7 +359,7 @@ if [ -n "$CHAIN_IDS_INPUT" ]; then
     for chain_id in "${CHAIN_ID_ARRAY[@]}"; do
         chain_name=$(get_chain_name "$chain_id")
         if [ $? -eq 0 ]; then
-            contracts_file="deployment/$ENVIRONMENT/$chain_id/$chain_name.json"
+            contracts_file="$SCRIPT_DIR/deployment/$ENVIRONMENT/$chain_id/$chain_name.json"
             if [ -f "$contracts_file" ]; then
                 echo -e "${GREEN}   ✅ Found deployment: $chain_name (Chain ID: $chain_id)${NC}"
                 FOUND_DEPLOYMENTS+=("$chain_id:$chain_name")
@@ -376,7 +376,7 @@ else
     for chain_id in $(get_all_chain_ids); do
         chain_name=$(get_chain_name "$chain_id")
         if [ -n "$chain_name" ]; then
-            contracts_file="deployment/$ENVIRONMENT/$chain_id/$chain_name.json"
+            contracts_file="$SCRIPT_DIR/deployment/$ENVIRONMENT/$chain_id/$chain_name.json"
             if [ -f "$contracts_file" ]; then
                 echo -e "${GREEN}   ✅ Found deployment: $chain_name (Chain ID: $chain_id)${NC}"
                 FOUND_DEPLOYMENTS+=("$chain_id:$chain_name")
@@ -386,7 +386,7 @@ else
 fi
 
 if [ ${#FOUND_DEPLOYMENTS[@]} -eq 0 ]; then
-    echo -e "${RED}❌ No Nexus contract deployments found in deployment/$ENVIRONMENT/ directory${NC}"
+    echo -e "${RED}❌ No Nexus contract deployments found in $SCRIPT_DIR/deployment/$ENVIRONMENT/ directory${NC}"
     echo -e "${YELLOW}Please ensure contracts have been deployed before running this script.${NC}"
     exit 1
 fi
