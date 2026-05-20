@@ -96,6 +96,7 @@
   
   hyperevm = "${HYPER_EVM_RPC_URL}"
   flare = "${FLARE_RPC_URL}"
+  stable = "${STABLE_RPC_URL}"
 
   coredao-testnet="${CORE_DAO_TESTNET_RPC_URL}"
 
