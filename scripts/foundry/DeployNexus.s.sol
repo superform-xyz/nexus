@@ -49,6 +49,11 @@ contract DeployNexus is Script {
         chainNames[146] = "Sonic";
         chainNames[100] = "Gnosis";
         chainNames[480] = "Worldchain";
+        chainNames[999] = "HyperEVM";
+        chainNames[14] = "Flare";
+        chainNames[988] = "Stable";
+        chainNames[4663] = "RH";
+        chainNames[5042] = "Arc"; // Circle Arc L1 (USDC-native gas)
     }
 
     function run(bool check, address defaultValidator_) public {
